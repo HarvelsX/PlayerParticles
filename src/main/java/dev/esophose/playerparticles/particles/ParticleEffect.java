@@ -201,7 +201,7 @@ public enum ParticleEffect {
         changed |= this.setIfNotExists("gui-icon-material", this.defaultIconMaterialNames);
 
         if (changed)
-            this.config.save();
+            this.config.save(file);
     }
 
     /**

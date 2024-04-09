@@ -13,12 +13,7 @@ public class SimplifiedChineseLocale implements Locale {
     }
 
     @Override
-    public String getTranslatorName() {
-        return "qsefthuopq";
-    }
-
-    @Override
-    public Map<String, Object> getDefaultLocaleValues() {
+    public Map<String, Object> getLocaleValues() {
         return new LinkedHashMap<String, Object>() {{
             this.put("#0", "Plugin Message Prefix");
             this.put("prefix", "&7[<g:#00aaaa:#0066aa>PlayerParticles&7] ");

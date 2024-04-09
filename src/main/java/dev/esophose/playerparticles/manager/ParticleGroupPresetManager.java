@@ -378,7 +378,7 @@ public class ParticleGroupPresetManager extends Manager {
         }
 
         // Reload the config
-        presetsConfig.reloadConfig();
+        presetsConfig = CommentedFileConfiguration.loadConfiguration(presetsFile);
 
         // Delete everything in the presets section
         presetsConfig.set("page1.presets", null);
@@ -416,7 +416,7 @@ public class ParticleGroupPresetManager extends Manager {
                 slot = maxSlot;
         }
 
-        presetsConfig.save();
+        presetsConfig.save(presetsFile);
     }
 
     private static class PresetData {

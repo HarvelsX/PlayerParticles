@@ -45,9 +45,9 @@ public class GuiInventoryDefault extends GuiInventory {
         if (currentIconMeta != null) {
             currentIconMeta.setDisplayName(localeManager.getLocaleMessage("gui-color-icon-name") + pplayer.getPlayer().getName());
             String[] currentIconLore = new String[]{
-                    localeManager.getLocaleMessage("gui-color-info") + localeManager.getLocaleMessage("gui-active-particles", StringPlaceholders.single("amount", pplayer.getActiveParticles().size())),
-                    localeManager.getLocaleMessage("gui-color-info") + localeManager.getLocaleMessage("gui-saved-groups", StringPlaceholders.single("amount", pplayer.getParticleGroups().size() - 1)),
-                    localeManager.getLocaleMessage("gui-color-info") + localeManager.getLocaleMessage("gui-fixed-effects", StringPlaceholders.single("amount", pplayer.getFixedEffectIds().size())),
+                    localeManager.getLocaleMessage("gui-color-info") + localeManager.getLocaleMessage("gui-active-particles", StringPlaceholders.of("amount", pplayer.getActiveParticles().size())),
+                    localeManager.getLocaleMessage("gui-color-info") + localeManager.getLocaleMessage("gui-saved-groups", StringPlaceholders.of("amount", pplayer.getParticleGroups().size() - 1)),
+                    localeManager.getLocaleMessage("gui-color-info") + localeManager.getLocaleMessage("gui-fixed-effects", StringPlaceholders.of("amount", pplayer.getFixedEffectIds().size())),
                     " ",
                     localeManager.getLocaleMessage("gui-color-info") + localeManager.getLocaleMessage("gui-commands-info"),
                     " ",

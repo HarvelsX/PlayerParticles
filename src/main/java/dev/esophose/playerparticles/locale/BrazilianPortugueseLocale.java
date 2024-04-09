@@ -13,12 +13,7 @@ public class BrazilianPortugueseLocale implements Locale {
     }
 
     @Override
-    public String getTranslatorName() {
-        return "Guztaver";
-    }
-    
-    @Override
-    public Map<String, Object> getDefaultLocaleValues() {
+    public Map<String, Object> getLocaleValues() {
         return new LinkedHashMap<String, Object>() {{
             this.put("#0", "Prefixo da Mensagem do Plugin");
             this.put("prefix", "&7[<g:#00aaaa:#0066aa>PlayerParticles&7] ");

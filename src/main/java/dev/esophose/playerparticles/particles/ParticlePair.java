@@ -361,7 +361,7 @@ public class ParticlePair {
                 } else if (this.noteColor.equals(NoteColor.RANDOM)) {
                     return localeManager.getLocaleMessage("random");
                 }
-                return localeManager.getLocaleMessage("gui-select-data-note", StringPlaceholders.single("note", this.noteColor.getNote()));
+                return localeManager.getLocaleMessage("gui-select-data-note", StringPlaceholders.of("note", this.noteColor.getNote()));
             } else {
                 if (this.color.equals(OrdinaryColor.RAINBOW)) {
                     return localeManager.getLocaleMessage("rainbow");

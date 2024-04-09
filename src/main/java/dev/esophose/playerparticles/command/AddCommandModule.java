@@ -39,7 +39,7 @@ public class AddCommandModule implements CommandModule {
         
         int maxParticlesAllowed = permissionManager.getMaxParticlesAllowed(pplayer);
         if (pplayer.getActiveParticles().size() >= maxParticlesAllowed) {
-            localeManager.sendMessage(pplayer, "add-reached-max", StringPlaceholders.single("amount", maxParticlesAllowed));
+            localeManager.sendMessage(pplayer, "add-reached-max", StringPlaceholders.of("amount", maxParticlesAllowed));
             return;
         }
 
@@ -47,19 +47,19 @@ public class AddCommandModule implements CommandModule {
         
         ParticleEffect effect = inputParser.next(ParticleEffect.class);
         if (effect == null) {
-            localeManager.sendMessage(pplayer, "effect-invalid", StringPlaceholders.single("effect", args[0]));
+            localeManager.sendMessage(pplayer, "effect-invalid", StringPlaceholders.of("effect", args[0]));
             return;
         } else if (!permissionManager.hasEffectPermission(pplayer, effect)) {
-            localeManager.sendMessage(pplayer, "effect-no-permission", StringPlaceholders.single("effect", effect.getName()));
+            localeManager.sendMessage(pplayer, "effect-no-permission", StringPlaceholders.of("effect", effect.getName()));
             return;
         }
 
         ParticleStyle style = inputParser.next(ParticleStyle.class);
         if (style == null) {
-            localeManager.sendMessage(pplayer, "style-invalid", StringPlaceholders.single("style", args[1]));
+            localeManager.sendMessage(pplayer, "style-invalid", StringPlaceholders.of("style", args[1]));
             return;
         } else if (!permissionManager.hasStylePermission(pplayer, style)) {
-            localeManager.sendMessage(pplayer, "style-no-permission", StringPlaceholders.single("style", style.getName()));
+            localeManager.sendMessage(pplayer, "style-no-permission", StringPlaceholders.of("style", style.getName()));
             return;
         }
 
@@ -120,12 +120,12 @@ public class AddCommandModule implements CommandModule {
         PlayerParticlesAPI.getInstance().savePlayerParticleGroup(pplayer.getPlayer(), group);
 
         StringPlaceholders addParticlePlaceholders = StringPlaceholders.builder("effect", newParticle.getEffect().getName())
-                .addPlaceholder("style", newParticle.getStyle().getName())
-                .addPlaceholder("data", newParticle.getDataString()).build();
+                .add("style", newParticle.getStyle().getName())
+                .add("data", newParticle.getDataString()).build();
         localeManager.sendMessage(pplayer, "add-particle-applied", addParticlePlaceholders);
         
         if (PlayerParticles.getInstance().getManager(ParticleStyleManager.class).isEventHandled(newParticle.getStyle())) {
-            localeManager.sendMessage(pplayer, "style-event-spawning-info", StringPlaceholders.single("style", newParticle.getStyle().getName()));
+            localeManager.sendMessage(pplayer, "style-event-spawning-info", StringPlaceholders.of("style", newParticle.getStyle().getName()));
         }
     }
 

@@ -17,6 +17,7 @@ import dev.rosewood.rosegarden.manager.AbstractLocaleManager;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import org.bukkit.command.CommandSender;
 
@@ -75,7 +76,7 @@ public class LocaleManager extends AbstractLocaleManager {
     }
 
     @Override
-    public List<Locale> getLocales() {
+    protected Collection<Locale> getJarResourceLocales() {
         return Arrays.asList(
                 new BrazilianPortugueseLocale(),
                 new EnglishLocale(),
@@ -88,6 +89,4 @@ public class LocaleManager extends AbstractLocaleManager {
                 new VietnameseLocale()
         );
     }
-
-
 }
