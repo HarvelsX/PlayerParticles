@@ -14,6 +14,7 @@ import dev.esophose.playerparticles.particles.data.OrdinaryColor;
 import dev.esophose.playerparticles.styles.DefaultStyles;
 import dev.esophose.playerparticles.util.ParticleUtils;
 import java.awt.Color;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +34,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitTask;
+import space.arim.morepaperlib.scheduling.GracefulScheduling;
+import space.arim.morepaperlib.scheduling.ScheduledTask;
 
 public class ParticleManager extends Manager implements Listener, Runnable {
 
@@ -45,12 +47,12 @@ public class ParticleManager extends Manager implements Listener, Runnable {
     /**
      * The task that spawns the particles
      */
-    private BukkitTask particleTask;
+    private ScheduledTask particleTask;
 
     /**
      * The task that checks player worldguard region statuses
      */
-    private BukkitTask worldGuardTask;
+    private ScheduledTask worldGuardTask;
 
     /**
      * Rainbow particle effect hue and note color used for rainbow colorable effects
@@ -72,16 +74,17 @@ public class ParticleManager extends Manager implements Listener, Runnable {
     @Override
     public void reload() {
         this.rosePlugin.getManager(DataManager.class).loadEffects();
-        
-        Bukkit.getScheduler().runTaskLater(this.rosePlugin, () -> {
+
+        final GracefulScheduling scheduling = PlayerParticles.getInstance().scheduling();
+        scheduling.asyncScheduler().run(() -> {
             long ticks = Setting.TICKS_PER_PARTICLE.getLong();
-            this.particleTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.rosePlugin, this, 0, ticks);
+            this.particleTask = scheduling.asyncScheduler().runAtFixedRate(this, Duration.ZERO, Duration.ofMillis(ticks * 50));
 
             if (WorldGuardHook.enabled()) {
                 long worldGuardTicks = Setting.WORLDGUARD_CHECK_INTERVAL.getLong();
-                this.worldGuardTask = Bukkit.getScheduler().runTaskTimer(this.rosePlugin, this::updateWorldGuardStatuses, 0, worldGuardTicks);
+                this.worldGuardTask = scheduling.asyncScheduler().runAtFixedRate(this::updateWorldGuardStatuses, Duration.ZERO, Duration.ofMillis(worldGuardTicks * 50));
             }
-        }, 5);
+        });
     }
 
     @Override

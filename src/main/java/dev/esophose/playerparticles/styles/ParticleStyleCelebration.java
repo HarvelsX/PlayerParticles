@@ -16,12 +16,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
+import space.arim.morepaperlib.scheduling.ScheduledTask;
 
 public class ParticleStyleCelebration extends ConfiguredParticleStyle {
 
@@ -120,15 +121,16 @@ public class ParticleStyleCelebration extends ConfiguredParticleStyle {
         final int fuse = this.baseFuseLength + random.nextInt(this.fuseLengthRandomizer);
         ParticleManager particleManager = PlayerParticles.getInstance().getManager(ParticleManager.class);
 
-        new BukkitRunnable() {
+        PlayerParticles.getInstance().scheduling().entitySpecificScheduler(pplayer.getPlayer()).runAtFixedRate(new Consumer<ScheduledTask>() {
             private Location location = loc;
             private int fuseLength = fuse;
             private int fuseTimer = 0;
             private boolean finished = false;
 
-            public void run() {
+            @Override
+            public void accept(ScheduledTask task) {
                 if (this.finished) {
-                    this.cancel();
+                    task.cancel();
                     return;
                 }
 
@@ -138,7 +140,7 @@ public class ParticleStyleCelebration extends ConfiguredParticleStyle {
                     trail.setStyle(DefaultStyles.CELEBRATION);
 
                     particleManager.displayParticles(pplayer, this.location.getWorld(), trail, Collections.singletonList(PParticle.point(this.location)), true, true);
-                    
+
                     this.location.add(0, ParticleStyleCelebration.this.fuseSpacing, 0);
                 } else {
                     List<PParticle> particles = new ArrayList<>();
@@ -151,7 +153,7 @@ public class ParticleStyleCelebration extends ConfiguredParticleStyle {
                         double dx = radius * MathL.sin(phi) * MathL.cos(theta);
                         double dy = radius * MathL.sin(phi) * MathL.sin(theta);
                         double dz = radius * MathL.cos(phi);
-                        
+
                         particles.add(PParticle.point(this.location.clone().add(dx, dy, dz)));
                     }
                     particleManager.displayParticles(pplayer, this.location.getWorld(), particle, particles, true, true);
@@ -159,8 +161,9 @@ public class ParticleStyleCelebration extends ConfiguredParticleStyle {
                     this.finished = true;
                 }
                 this.fuseTimer++;
+
             }
-        }.runTaskTimer(PlayerParticles.getInstance(), 0, 1);
+        }, null, 0, 1);
     }
 
 }

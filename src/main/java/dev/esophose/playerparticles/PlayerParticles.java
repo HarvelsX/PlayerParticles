@@ -27,9 +27,10 @@ import java.util.List;
 
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
-import dev.rosewood.rosegarden.utils.NMSUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
+import space.arim.morepaperlib.MorePaperLib;
+import space.arim.morepaperlib.scheduling.GracefulScheduling;
 
 /**
  * @author Esophose
@@ -40,6 +41,8 @@ public class PlayerParticles extends RosePlugin {
      * The running instance of PlayerParticles on the server
      */
     private static PlayerParticles INSTANCE;
+
+    private final MorePaperLib paperLib = new MorePaperLib(this);
 
     public PlayerParticles() {
         super(40261, 3531, ConfigurationManager.class, DataManager.class, LocaleManager.class, null);
@@ -98,6 +101,10 @@ public class PlayerParticles extends RosePlugin {
      */
     public static PlayerParticles getInstance() {
         return INSTANCE;
+    }
+
+    public GracefulScheduling scheduling() {
+        return paperLib.scheduling();
     }
 
     /**

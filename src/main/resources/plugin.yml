@@ -2,6 +2,7 @@ name: PlayerParticles
 main: dev.esophose.playerparticles.PlayerParticles
 version: '@version@'
 api-version: '1.13'
+folia-supported: true
 description: Display particles around your player and blocks using customized styles and data!
 author: Esophose
 website: https://www.spigotmc.org/resources/40261/

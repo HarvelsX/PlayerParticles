@@ -53,7 +53,7 @@ public class DataManager extends AbstractDataManager {
      * Loads all fixed effects and player particles from the database
      */
     public void loadEffects() {
-        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+        PlayerParticles.getInstance().scheduling().asyncScheduler().run(() -> {
             this.loadFixedEffects();
             for (Player player : Bukkit.getOnlinePlayers())
                 this.getPPlayer(player.getUniqueId(), (pplayer) -> { }); // Loads the PPlayer from the database
@@ -577,7 +577,7 @@ public class DataManager extends AbstractDataManager {
      * @param asyncCallback The callback to run on a separate thread
      */
     private void async(Runnable asyncCallback) {
-        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, asyncCallback);
+        PlayerParticles.getInstance().scheduling().asyncScheduler().run(asyncCallback);
     }
 
     /**
@@ -586,7 +586,7 @@ public class DataManager extends AbstractDataManager {
      * @param syncCallback The callback to run on the main thread
      */
     private void sync(Runnable syncCallback) {
-        Bukkit.getScheduler().runTask(this.rosePlugin, syncCallback);
+        PlayerParticles.getInstance().scheduling().globalRegionalScheduler().run(syncCallback);
     }
 
     @Override

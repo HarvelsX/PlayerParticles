@@ -5,6 +5,8 @@ import dev.esophose.playerparticles.manager.ConfigurationManager.Setting;
 import dev.esophose.playerparticles.manager.LocaleManager;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,13 +17,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+import space.arim.morepaperlib.scheduling.ScheduledTask;
 
-public class PlayerChatHook extends BukkitRunnable implements Listener {
+public class PlayerChatHook implements Runnable, Listener {
 
     private static Set<PlayerChatHookData> hooks;
-    private static BukkitTask hookTask = null;
+    private static ScheduledTask hookTask = null;
 
     /**
      * Initializes all the static values for this class
@@ -30,12 +31,16 @@ public class PlayerChatHook extends BukkitRunnable implements Listener {
         hooks = Collections.synchronizedSet(new HashSet<>());
         if (hookTask != null)
             hookTask.cancel();
-        hookTask = new PlayerChatHook().runTaskTimer(PlayerParticles.getInstance(), 0, 20);
+        hookTask = PlayerParticles.getInstance().scheduling().asyncScheduler().runAtFixedRate(
+                new PlayerChatHook(),
+                Duration.ZERO,
+                Duration.ofSeconds(1)
+        );
     }
-    
+
     /**
      * Called when a player sends a message in chat
-     * 
+     *
      * @param event The AsyncPlayerChatEvent
      */
     @EventHandler
@@ -49,20 +54,20 @@ public class PlayerChatHook extends BukkitRunnable implements Listener {
             }
         }
     }
-    
+
     /**
      * Ticked every second to decrease the seconds remaining on each hook
      */
     public void run() {
         Set<PlayerChatHookData> hooksToRemove = new HashSet<>();
-        
+
         for (PlayerChatHookData hook : hooks) {
             if (hook.timedOut()) {
                 hook.triggerCallback(null);
                 hooksToRemove.add(hook);
                 continue;
             }
-            
+
             Player player = Bukkit.getPlayer(hook.getPlayerUUID());
             if (player == null) {
                 hooksToRemove.remove(hook);
@@ -91,14 +96,14 @@ public class PlayerChatHook extends BukkitRunnable implements Listener {
 
             hook.decrementHookLength();
         }
-        
-        for (PlayerChatHookData hookToRemove : hooksToRemove) 
+
+        for (PlayerChatHookData hookToRemove : hooksToRemove)
             hooks.remove(hookToRemove);
     }
-    
+
     /**
      * Adds a player chat hook
-     * 
+     *
      * @param newHook The new hook to add
      */
     public static void addHook(PlayerChatHookData newHook) {

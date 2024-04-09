@@ -96,11 +96,11 @@ public class ParticleStyleTeleport extends ConfiguredParticleStyle implements Li
             }
 
             if (this.after) {
-                Bukkit.getScheduler().runTaskLater(PlayerParticles.getInstance(), () -> {
+                PlayerParticles.getInstance().scheduling().entitySpecificScheduler(player).runDelayed(() -> {
                     Location loc2 = player.getLocation();
                     loc2.setY(loc2.getY() + 1);
                     particleManager.displayParticles(pplayer, player.getWorld(), particle, DefaultStyles.TELEPORT.getParticles(particle, loc2), false);
-                }, 1);
+                }, null, 1L);
             }
         }
     }

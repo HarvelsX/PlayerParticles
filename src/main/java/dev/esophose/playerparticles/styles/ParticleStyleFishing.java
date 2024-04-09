@@ -5,11 +5,14 @@ import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.esophose.playerparticles.particles.PParticle;
 import dev.esophose.playerparticles.particles.ParticlePair;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -37,10 +40,11 @@ public class ParticleStyleFishing extends ConfiguredParticleStyle implements Lis
     protected ParticleStyleFishing() {
         super("fishing", false, false, 0);
 
-        this.projectiles = new HashSet<>();
+        this.projectiles = ConcurrentHashMap.newKeySet();
 
         // Removes all fish hooks that are considered dead
-        Bukkit.getScheduler().runTaskTimer(PlayerParticles.getInstance(), () -> this.projectiles.removeIf(x -> !x.isValid()), 0L, 5L);
+        PlayerParticles.getInstance().scheduling().asyncScheduler().runAtFixedRate(() ->
+                this.projectiles.removeIf(x -> !x.isValid()), Duration.ZERO, Duration.ofMillis(250));
     }
 
     @Override

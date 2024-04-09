@@ -4,6 +4,8 @@ import dev.esophose.playerparticles.PlayerParticles;
 import dev.esophose.playerparticles.particles.PParticle;
 import dev.esophose.playerparticles.particles.ParticlePair;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
+
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,14 +37,14 @@ public class ParticleStyleArrows extends ConfiguredParticleStyle implements List
         this.projectiles = new ConcurrentLinkedDeque<>();
 
         // Removes all arrows that are considered dead or too old to be tracked
-        Bukkit.getScheduler().runTaskTimer(PlayerParticles.getInstance(), () -> {
+        PlayerParticles.getInstance().scheduling().asyncScheduler().runAtFixedRate(() -> {
             this.projectiles.removeIf(launchedProjectile -> {
                 Projectile projectile = launchedProjectile.getProjectile();
                 if (!projectile.isValid())
                     return true;
                 return this.arrowTrackingTime != -1 && projectile.getTicksLived() >= this.arrowTrackingTime;
             });
-        }, 0L, 5L);
+        }, Duration.ZERO, Duration.ofMillis(250));
     }
 
     @Override

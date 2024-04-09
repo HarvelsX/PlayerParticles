@@ -44,6 +44,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.CommandMinecart;
+import space.arim.morepaperlib.scheduling.GracefulScheduling;
 
 public class CommandManager extends Manager implements CommandExecutor, TabCompleter {
 
@@ -149,6 +150,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         LocaleManager localeManager = PlayerParticles.getInstance().getManager(LocaleManager.class);
 
+        final GracefulScheduling scheduling = PlayerParticles.getInstance().scheduling();
         if (cmd.getName().equalsIgnoreCase("pp")) {
             String commandName = args.length > 0 ? args[0] : "";
             CommandModule commandModule = this.findMatchingCommand(commandName);
@@ -157,7 +159,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
                 return true;
             }
 
-            Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            scheduling.asyncScheduler().run(() -> {
                 String[] cmdArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
 
                 if (!commandModule.canConsoleExecute()) {
@@ -219,7 +221,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
             }
 
             // Run the /ppo command
-            Bukkit.getScheduler().runTask(this.rosePlugin, () -> this.ppoCommand.onCommandExecute(sender, args));
+            scheduling.globalRegionalScheduler().run(() -> this.ppoCommand.onCommandExecute(sender, args));
         }
         
         return true;

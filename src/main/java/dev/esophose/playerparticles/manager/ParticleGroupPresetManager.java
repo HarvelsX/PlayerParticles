@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -56,7 +57,7 @@ public class ParticleGroupPresetManager extends Manager {
      */
     @Override
     public void reload() {
-        this.presetGroupPages = new HashMap<>();
+        this.presetGroupPages = new ConcurrentHashMap<>(1, 0.75F, 1);
         
         File pluginDataFolder = PlayerParticles.getInstance().getDataFolder();
         if (!pluginDataFolder.exists())
@@ -74,8 +75,8 @@ public class ParticleGroupPresetManager extends Manager {
         } else {
             this.tryMigrateOld(presetsFile);
         }
-        
-        Bukkit.getScheduler().runTaskLater(this.rosePlugin, () -> this.tryParseFile(presetsFile), 3L);
+
+        PlayerParticles.getInstance().scheduling().asyncScheduler().run(() -> this.tryParseFile(presetsFile));
     }
 
     private void tryParseFile(File presetsFile) {

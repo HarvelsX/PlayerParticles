@@ -11,6 +11,7 @@ import dev.esophose.playerparticles.particles.ParticlePair;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -18,7 +19,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.scheduler.BukkitRunnable;
+import space.arim.morepaperlib.scheduling.ScheduledTask;
 
 public class ParticleStyleDeath extends ConfiguredParticleStyle implements Listener {
 
@@ -83,19 +84,19 @@ public class ParticleStyleDeath extends ConfiguredParticleStyle implements Liste
             return;
 
         Location location = event.getEntity().getLocation().add(0, 1, 0);
-        new BukkitRunnable() {
+        PlayerParticles.getInstance().scheduling().entitySpecificScheduler(pplayer.getPlayer()).runAtFixedRate(new Consumer<ScheduledTask>() {
             private int totalDuration = 0;
 
             @Override
-            public void run() {
+            public void accept(ScheduledTask task) {
                 for (ParticlePair particle : pplayer.getActiveParticlesForStyle(DefaultStyles.DEATH))
                     particleManager.displayParticles(pplayer, event.getEntity().getWorld(), particle, DefaultStyles.DEATH.getParticles(particle, location), false);
 
-                this.totalDuration += ParticleStyleDeath.this.ticksPerParticle;
+                this.totalDuration += (int) ParticleStyleDeath.this.ticksPerParticle;
                 if (this.totalDuration > ParticleStyleDeath.this.targetDuration)
-                    this.cancel();
+                    task.cancel();
             }
-        }.runTaskTimer(PlayerParticles.getInstance(), 0, this.ticksPerParticle);
+        }, null, 0, this.ticksPerParticle);
     }
 
 }

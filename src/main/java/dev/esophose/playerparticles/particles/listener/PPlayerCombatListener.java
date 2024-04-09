@@ -4,6 +4,8 @@ import dev.esophose.playerparticles.PlayerParticles;
 import dev.esophose.playerparticles.manager.ConfigurationManager.Setting;
 import dev.esophose.playerparticles.manager.DataManager;
 import dev.esophose.playerparticles.particles.PPlayer;
+
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +28,7 @@ public class PPlayerCombatListener implements Listener {
     public PPlayerCombatListener() {
         DataManager dataManager = PlayerParticles.getInstance().getManager(DataManager.class);
 
-        Bukkit.getScheduler().runTaskTimer(PlayerParticles.getInstance(), () -> {
+        PlayerParticles.getInstance().scheduling().globalRegionalScheduler().runAtFixedRate(() -> {
             if (!Setting.TOGGLE_ON_COMBAT.getBoolean())
                 return;
 

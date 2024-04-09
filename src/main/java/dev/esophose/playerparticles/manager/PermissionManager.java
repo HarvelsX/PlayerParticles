@@ -1,5 +1,6 @@
 package dev.esophose.playerparticles.manager;
 
+import dev.esophose.playerparticles.PlayerParticles;
 import dev.esophose.playerparticles.manager.ConfigurationManager.Setting;
 import dev.esophose.playerparticles.particles.OtherPPlayer;
 import dev.esophose.playerparticles.particles.PPlayer;
@@ -88,7 +89,7 @@ public class PermissionManager extends Manager {
     public PermissionManager(RosePlugin playerParticles) {
         super(playerParticles);
 
-        Bukkit.getScheduler().runTaskLater(playerParticles, () -> {
+        PlayerParticles.getInstance().scheduling().globalRegionalScheduler().runDelayed(() -> {
             try {
                 // Register plugin permissions to Bukkit
                 PluginManager pluginManager = Bukkit.getPluginManager();

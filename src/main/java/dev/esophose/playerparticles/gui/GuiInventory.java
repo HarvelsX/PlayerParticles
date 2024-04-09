@@ -190,7 +190,8 @@ public abstract class GuiInventory {
     }
 
     public void close() {
-        Bukkit.getScheduler().runTask(PlayerParticles.getInstance(), () -> this.pplayer.getPlayer().closeInventory());
+        final Player player = this.pplayer.getPlayer();
+        PlayerParticles.getInstance().scheduling().entitySpecificScheduler(player).run(player::closeInventory, null);
     }
 
 }
