@@ -218,7 +218,7 @@ public class FixedCommandModule implements CommandModule {
                     }
                 }
             } else if (effect.hasProperty(ParticleProperty.REQUIRES_MATERIAL_DATA)) {
-                if (effect == ParticleEffect.BLOCK || effect == ParticleEffect.FALLING_DUST || effect == ParticleEffect.BLOCK_MARKER) {
+                if (effect == ParticleEffect.BLOCK || effect == ParticleEffect.FALLING_DUST || effect == ParticleEffect.BLOCK_MARKER || effect == ParticleEffect.DUST_PILLAR) {
                     blockData = inputParser.next(Material.class);
                     if (blockData == null || !blockData.isBlock()) {
                         localeManager.sendMessage(pplayer, "fixed-create-data-error");
@@ -360,7 +360,7 @@ public class FixedCommandModule implements CommandModule {
                         }
                     }
                 } else if (effect.hasProperty(ParticleProperty.REQUIRES_MATERIAL_DATA)) {
-                    if (effect == ParticleEffect.BLOCK || effect == ParticleEffect.FALLING_DUST || effect == ParticleEffect.BLOCK_MARKER) {
+                    if (effect == ParticleEffect.BLOCK || effect == ParticleEffect.FALLING_DUST || effect == ParticleEffect.BLOCK_MARKER || effect == ParticleEffect.DUST_PILLAR) {
                         blockData = inputParser.next(Material.class);
                         if (blockData == null || !blockData.isBlock()) {
                             localeManager.sendMessage(pplayer, "fixed-edit-data-error");
@@ -590,7 +590,7 @@ public class FixedCommandModule implements CommandModule {
             return;
         }
 
-        PlayerParticles.getInstance().scheduling().entitySpecificScheduler(player).run(() -> player.teleport(fixedEffect.getLocation()), null);
+        Bukkit.getScheduler().runTask(PlayerParticles.getInstance(), () -> player.teleport(fixedEffect.getLocation()));
         localeManager.sendMessage(pplayer, "fixed-teleport-success", StringPlaceholders.of("id", id));
     }
 
@@ -686,7 +686,7 @@ public class FixedCommandModule implements CommandModule {
                                 }
                                 StringUtil.copyPartialMatches(args[args.length - 1], possibleValues, matches);
                             } else if (args.length == 7 && effect.hasProperty(ParticleProperty.REQUIRES_MATERIAL_DATA)) {
-                                if (effect == ParticleEffect.BLOCK || effect == ParticleEffect.FALLING_DUST || effect == ParticleEffect.BLOCK_MARKER) { // Block material
+                                if (effect == ParticleEffect.BLOCK || effect == ParticleEffect.FALLING_DUST || effect == ParticleEffect.BLOCK_MARKER || effect == ParticleEffect.DUST_PILLAR) { // Block material
                                     StringUtil.copyPartialMatches(args[6], ParticleUtils.BLOCK_MATERIALS_STRING, matches);
                                 } else if (effect == ParticleEffect.ITEM) { // Item material
                                     StringUtil.copyPartialMatches(args[6], ParticleUtils.ITEM_MATERIALS_STRING, matches);
@@ -796,7 +796,7 @@ public class FixedCommandModule implements CommandModule {
                                     }
                                     StringUtil.copyPartialMatches(args[args.length - 1], possibleValues, matches);
                                 } else if (args.length == 4 && effect.hasProperty(ParticleProperty.REQUIRES_MATERIAL_DATA)) {
-                                    if (effect == ParticleEffect.BLOCK || effect == ParticleEffect.FALLING_DUST || effect == ParticleEffect.BLOCK_MARKER) { // Block material
+                                    if (effect == ParticleEffect.BLOCK || effect == ParticleEffect.FALLING_DUST || effect == ParticleEffect.BLOCK_MARKER || effect == ParticleEffect.DUST_PILLAR) { // Block material
                                         StringUtil.copyPartialMatches(args[3], ParticleUtils.BLOCK_MATERIALS_STRING, matches);
                                     } else if (effect == ParticleEffect.ITEM) { // Item material
                                         StringUtil.copyPartialMatches(args[3], ParticleUtils.ITEM_MATERIALS_STRING, matches);

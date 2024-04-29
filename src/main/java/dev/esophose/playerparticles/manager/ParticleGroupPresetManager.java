@@ -176,7 +176,7 @@ public class ParticleGroupPresetManager extends Manager {
                                         }
                                     }
                                 } else if (effect.hasProperty(ParticleProperty.REQUIRES_MATERIAL_DATA)) {
-                                    if (effect == ParticleEffect.BLOCK || effect == ParticleEffect.FALLING_DUST || effect == ParticleEffect.BLOCK_MARKER) {
+                                    if (effect == ParticleEffect.BLOCK || effect == ParticleEffect.FALLING_DUST || effect == ParticleEffect.BLOCK_MARKER || effect == ParticleEffect.DUST_PILLAR) {
                                         blockData = inputParser.next(Material.class);
                                         if (blockData == null || !blockData.isBlock()) {
                                             PlayerParticles.getInstance().getLogger().severe("Invalid block: '" + dataString + "'!");
