@@ -191,7 +191,7 @@ public abstract class GuiInventory {
 
     public void close() {
         final Player player = this.pplayer.getPlayer();
-        PlayerParticles.getInstance().scheduling().entitySpecificScheduler(player).run(player::closeInventory, null);
+        PlayerParticles.getInstance().scheduling().entitySpecificScheduler(player).run((Runnable) player::closeInventory, null);
     }
 
 }
