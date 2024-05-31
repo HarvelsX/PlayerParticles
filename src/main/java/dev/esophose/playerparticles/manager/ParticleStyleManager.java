@@ -7,11 +7,10 @@ import dev.esophose.playerparticles.particles.ParticleGroup;
 import dev.esophose.playerparticles.styles.ConfiguredParticleStyle;
 import dev.esophose.playerparticles.styles.DefaultStyles;
 import dev.esophose.playerparticles.styles.ParticleStyle;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import dev.rosewood.rosegarden.RosePlugin;
@@ -30,9 +29,9 @@ public class ParticleStyleManager extends Manager {
     public ParticleStyleManager(RosePlugin playerParticles) {
         super(playerParticles);
 
-        this.stylesByName = new HashMap<>();
-        this.stylesByInternalName = new HashMap<>();
-        this.eventStyles = new ArrayList<>();
+        this.stylesByName = new ConcurrentHashMap<>();
+        this.stylesByInternalName = new ConcurrentHashMap<>();
+        this.eventStyles = new CopyOnWriteArrayList<>();
 
         DefaultStyles.initStyles();
     }
@@ -65,7 +64,7 @@ public class ParticleStyleManager extends Manager {
             List<ParticleStyle> styles = new ArrayList<>(event.getRegisteredStyles().values());
             styles.addAll(eventStyles);
 
-            for (ParticleStyle style : styles) {
+            styles.removeIf(style -> {
                 try {
                     if (style == null)
                         throw new IllegalArgumentException("Tried to register a null style");
@@ -85,12 +84,14 @@ public class ParticleStyleManager extends Manager {
                     this.stylesByName.put(style.getName().toLowerCase(), style);
                     this.stylesByInternalName.put(style.getInternalName().toLowerCase(), style);
 
-                    if (eventStyles.contains(style))
-                        this.eventStyles.add(style);
+                    return !eventStyles.contains(style);
                 } catch (IllegalArgumentException ex) {
                     ex.printStackTrace();
+                    return true;
                 }
-            }
+            });
+
+            this.eventStyles.addAll(styles);
         });
     }
 

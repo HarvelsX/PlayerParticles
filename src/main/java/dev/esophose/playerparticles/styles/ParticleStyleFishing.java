@@ -1,19 +1,17 @@
 package dev.esophose.playerparticles.styles;
 
+import com.google.common.collect.ImmutableSet;
 import dev.esophose.playerparticles.PlayerParticles;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.esophose.playerparticles.particles.PParticle;
 import dev.esophose.playerparticles.particles.ParticlePair;
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -22,6 +20,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.projectiles.ProjectileSource;
+import space.arim.morepaperlib.scheduling.GracefulScheduling;
+import space.arim.morepaperlib.scheduling.ScheduledTask;
 
 public class ParticleStyleFishing extends ConfiguredParticleStyle implements Listener {
 
@@ -35,7 +35,7 @@ public class ParticleStyleFishing extends ConfiguredParticleStyle implements Lis
         }
     }
 
-    private Set<Projectile> projectiles;
+    private final Set<Projectile> projectiles;
 
     protected ParticleStyleFishing() {
         super("fishing", false, false, 0);
@@ -43,22 +43,46 @@ public class ParticleStyleFishing extends ConfiguredParticleStyle implements Lis
         this.projectiles = ConcurrentHashMap.newKeySet();
 
         // Removes all fish hooks that are considered dead
-        PlayerParticles.getInstance().scheduling().asyncScheduler().runAtFixedRate(() ->
-                this.projectiles.removeIf(x -> !x.isValid()), Duration.ZERO, Duration.ofMillis(250));
+        GracefulScheduling scheduling = PlayerParticles.getInstance().scheduling();
+        scheduling.asyncScheduler().runAtFixedRate(() -> {
+            for (Projectile projectile : this.projectiles) {
+                ScheduledTask task = scheduling.entitySpecificScheduler(projectile).run(() -> {
+                    if (projectile.isValid()) return;
+                    this.projectiles.remove(projectile);
+                }, () -> this.projectiles.remove(projectile));
+
+                if (task == null) {
+                    this.projectiles.remove(projectile);
+                }
+            }
+        }, Duration.ZERO, Duration.ofMillis(250));
     }
 
     @Override
     public List<PParticle> getParticles(ParticlePair particle, Location location) {
-        List<PParticle> particles = new ArrayList<>();
+        Queue<PParticle> particles = new ConcurrentLinkedQueue<>();
 
-        List<Projectile> listCopy = new ArrayList<>(this.projectiles); // Copy in case of modification while looping due to async
-        for (Projectile projectile : listCopy) {
-            ProjectileSource shooter = projectile.getShooter();
-            if (shooter instanceof Player && ((Player) shooter).getUniqueId().equals(particle.getOwnerUniqueId()))
-                particles.add(PParticle.builder(projectile.getLocation()).offsets(0.05F, 0.05F, 0.05F).build());
+        CountDownLatch countDownLatch = new CountDownLatch(this.projectiles.size());
+        for (Projectile projectile : this.projectiles) {
+            ScheduledTask task = PlayerParticles.getInstance().scheduling().entitySpecificScheduler(projectile).run(() -> {
+                ProjectileSource shooter = projectile.getShooter();
+                if (shooter instanceof Player && ((Player) shooter).getUniqueId().equals(particle.getOwnerUniqueId())) {
+                    particles.add(PParticle.builder(projectile.getLocation()).offsets(0.05F, 0.05F, 0.05F).build());
+                }
+                countDownLatch.countDown();
+            }, countDownLatch::countDown);
+
+            if (task == null) {
+                countDownLatch.countDown();
+            }
         }
 
-        return particles;
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException ignored) {
+        }
+
+        return new ArrayList<>(particles);
     }
 
     @Override

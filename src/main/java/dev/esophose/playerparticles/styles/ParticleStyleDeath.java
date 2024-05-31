@@ -96,7 +96,7 @@ public class ParticleStyleDeath extends ConfiguredParticleStyle implements Liste
                 if (this.totalDuration > ParticleStyleDeath.this.targetDuration)
                     task.cancel();
             }
-        }, null, 0, this.ticksPerParticle);
+        }, null, 1L, this.ticksPerParticle);
     }
 
 }

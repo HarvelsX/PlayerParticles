@@ -47,7 +47,7 @@ public class PPlayerCombatListener implements Listener {
 
             for (UUID uuid : toRemove)
                 this.timeSinceCombat.remove(uuid);
-        }, 0, CHECK_INTERVAL);
+        }, 1L, CHECK_INTERVAL);
     }
 
     /**

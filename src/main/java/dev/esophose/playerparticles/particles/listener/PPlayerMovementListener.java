@@ -59,7 +59,7 @@ public class PPlayerMovementListener implements Listener {
 
             for (UUID uuid : toRemove)
                 this.timeSinceLastMovement.remove(uuid);
-        }, 0, CHECK_INTERVAL);
+        }, 1L, CHECK_INTERVAL);
     }
 
 }

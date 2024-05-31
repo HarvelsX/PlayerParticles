@@ -21,6 +21,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import space.arim.morepaperlib.scheduling.GracefulScheduling;
+import space.arim.morepaperlib.scheduling.ScheduledTask;
 
 public class ParticleStyleArrows extends ConfiguredParticleStyle implements Listener {
 
@@ -37,13 +39,25 @@ public class ParticleStyleArrows extends ConfiguredParticleStyle implements List
         this.projectiles = new ConcurrentLinkedDeque<>();
 
         // Removes all arrows that are considered dead or too old to be tracked
-        PlayerParticles.getInstance().scheduling().asyncScheduler().runAtFixedRate(() -> {
-            this.projectiles.removeIf(launchedProjectile -> {
+        final GracefulScheduling scheduling = PlayerParticles.getInstance().scheduling();
+        scheduling.asyncScheduler().runAtFixedRate(() -> {
+            for (LaunchedProjectile launchedProjectile : this.projectiles) {
                 Projectile projectile = launchedProjectile.getProjectile();
-                if (!projectile.isValid())
-                    return true;
-                return this.arrowTrackingTime != -1 && projectile.getTicksLived() >= this.arrowTrackingTime;
-            });
+                ScheduledTask task = scheduling.entitySpecificScheduler(projectile).run(() -> {
+                    boolean remove = this.arrowTrackingTime != -1
+                            && projectile.getTicksLived() >= this.arrowTrackingTime;
+
+                    if (projectile.isValid() && !remove) {
+                        return;
+                    }
+
+                    this.projectiles.remove(launchedProjectile);
+                }, () -> this.projectiles.remove(launchedProjectile));
+
+                if (task == null) {
+                    this.projectiles.remove(launchedProjectile);
+                }
+            }
         }, Duration.ZERO, Duration.ofMillis(250));
     }
 
@@ -62,7 +76,7 @@ public class ParticleStyleArrows extends ConfiguredParticleStyle implements List
                 particles.add(PParticle.builder(projectile.getLocation()).offsets(0.05F, 0.05F, 0.05F).build());
                 count++;
             }
-            
+
             if (count >= this.maxArrowsPerPlayer)
                 break;
         }

@@ -163,7 +163,7 @@ public class ParticleStyleCelebration extends ConfiguredParticleStyle {
                 this.fuseTimer++;
 
             }
-        }, null, 0, 1);
+        }, null, 1L, 1L);
     }
 
 }
